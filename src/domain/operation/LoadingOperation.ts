@@ -12,8 +12,7 @@ export interface LoadingOperationParams {
   resources?: Resource[];
   vehicles?: string[];
   status?: OperationStatus;
-  outboundRequest: OutboundRequest; 
-  operatorId?: string;
+  outboundRequest: OutboundRequest;  
   resourceId?: string;
   notes?: string;
 }

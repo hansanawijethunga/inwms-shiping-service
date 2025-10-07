@@ -5,7 +5,7 @@ export type OperationStatus = 'Initialized' | 'Started' | 'Completed';
 
 
  export interface UnloadingOperationParams {
-  operationId: string;
+ 
   date: Date;
   startTime?: string;
   endTime?: string;
@@ -13,7 +13,7 @@ export type OperationStatus = 'Initialized' | 'Started' | 'Completed';
   vehicles?: string[];
   status?: OperationStatus;
   inboundRequest: InboundRequest;
-  operatorId?: string;
+  operationId: string;
   notes?: string;
 }
 
