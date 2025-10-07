@@ -36,28 +36,26 @@ export class ResourceService implements IResourceService {
     let resource: Resource;
     if (type === 'forklift') {
       resource = this.domainForkliftFactory.create(data);
-      (resource as any)._id = id;
-      return await resource.update();
     } else if (type === 'worker') {
       resource = this.domainWorkerFactory.create(data);
-      (resource as any)._id = id;
-      return await resource.update();
+    } else {
+      throw new Error('Unknown resource type');
     }
-    throw new Error('Unknown resource type');
+    (resource as any)._id = id;
+    return await resource.update();
   }
 
   async delete(type: ResourceType, id: string): Promise<boolean> {
     let resource: Resource;
     if (type === 'forklift') {
       resource = this.domainForkliftFactory.create({ code: '', model: '' });
-      (resource as any)._id = id;
-      return await resource.delete();
     } else if (type === 'worker') {
       resource = this.domainWorkerFactory.create({ name: '', code: '' });
-      (resource as any)._id = id;
-      return await resource.delete();
+    } else {
+      throw new Error('Unknown resource type');
     }
-    throw new Error('Unknown resource type');
+    (resource as any)._id = id;
+    return await resource.delete();
   }
 
   async getById(type: ResourceType, id: string): Promise<any> {
