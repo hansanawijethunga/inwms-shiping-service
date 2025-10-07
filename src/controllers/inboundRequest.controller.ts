@@ -22,7 +22,9 @@ export class InboundRequestController {
   static async updateProduct(req: Request, res: Response): Promise<void> {
     try {
       const id = req.params.id ?? '';
-      const inboundRequest = await inboundRequestService.updateProduct(id, req.body.products);
+      // Accepts an array payload for products
+      const products = Array.isArray(req.body) ? req.body : req.body.products;
+      const inboundRequest = await inboundRequestService.updateProduct(id, products);
       if (!inboundRequest) {
         res.status(404).json({ error: 'InboundRequest not found' });
         return;
