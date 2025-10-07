@@ -1,5 +1,5 @@
-import type { InboundRequest } from '../repositories/inboundRequest.model.js';
-import { InboundRequestModel } from '../repositories/inboundRequest.model.js';
+import { InboundRequest } from './InboundRequest.js';
+import { InboundRequestModel } from '../../repositories/inboundRequest.model.js';
 
 export class InboundRequestBuilder {
   private request: Partial<InboundRequest> = {};
@@ -37,11 +37,21 @@ export class InboundRequestBuilder {
   }
 
   build(): InboundRequest {
-    return this.request as InboundRequest;
+    // Map builder fields to domain class constructor
+    return new InboundRequest({
+      shipmentNumber: (this.request as any).shipmentNumber,
+      arrivalDate: (this.request as any).arrivalDate || new Date(),
+      externalTrackingNumber: (this.request as any).externalTrackingNumber || '',
+      company: (this.request as any).company,
+      products: (this.request as any).products || [],
+      status: (this.request as any).status,
+      notes: (this.request as any).notes || '',
+      _id: (this.request as any)._id
+    });
   }
 
-  async save(): Promise<InboundRequest> {
-    const inboundRequest = new InboundRequestModel(this.build());
-    return await inboundRequest.save();
+  async save(): Promise<any> {
+    const domainObj = this.build();
+    return await domainObj.save();
   }
 }

@@ -1,6 +1,9 @@
 import type { InboundRequest } from '../repositories/inboundRequest.model.js';
 import { InboundRequestModel } from '../repositories/inboundRequest.model.js';
-import { InboundRequestBuilder } from '../factories/inboundRequest.builder.js';
+import { InboundRequestBuilder } from '../domain/request/InboundRequestBuilder.js';
+import { Company } from '../domain/request/Company.js';
+import { Product } from '../domain/request/Product.js';
+import { ProductItem } from '../domain/request/ProductItem.js';
 
 export class InboundRequestService {
   async create(data: Partial<InboundRequest>): Promise<InboundRequest> {
@@ -14,13 +17,26 @@ export class InboundRequestService {
       }
     }
     const shipmentNumber = `SHP${nextNumber.toString().padStart(3, '0')}`;
+    const domainCompany = data.company ? new Company(data.company.companyId, data.company.name) : undefined;
+    const domainProducts = (data.products ?? []).map(p => new Product(
+      p.productId,
+      p.productName,
+      p.productCode,
+      p.productAreaM2,
+      p.requiresExpiry,
+      p.requiresSerial,
+      p.handlingNotes,
+      p.quantity,
+      p.productItems.map(item => new ProductItem(item.productItemId, item.name))
+    ));
+    const requestDetails: any = {
+      arrivalDate: data.arrivalDate!,
+      externalTrackingNumber: data.externalTrackingNumber!
+    };
+    if (domainCompany) requestDetails.company = domainCompany;
     const builder = new InboundRequestBuilder()
-      .setRequestDetails({
-        arrivalDate: data.arrivalDate!,
-        externalTrackingNumber: data.externalTrackingNumber!,
-        company: data.company!
-      })
-      .setProduct(data.products!)
+      .setRequestDetails(requestDetails)
+      .setProduct(domainProducts)
       .setStatus(data.status!)
       .setNotes(data.notes ?? '');
     // Set shipmentNumber directly on builder.request
@@ -35,7 +51,22 @@ export class InboundRequestService {
     const details: any = {};
     if (data.arrivalDate !== undefined) details.arrivalDate = data.arrivalDate;
     if (data.externalTrackingNumber !== undefined) details.externalTrackingNumber = data.externalTrackingNumber;
-    if (data.company !== undefined) details.company = data.company;
+    if (data.company !== undefined) {
+      details.company = new Company(data.company.companyId, data.company.name);
+    }
+    if (data.products !== undefined) {
+      details.products = data.products.map(p => new Product(
+        p.productId,
+        p.productName,
+        p.productCode,
+        p.productAreaM2,
+        p.requiresExpiry,
+        p.requiresSerial,
+        p.handlingNotes,
+        p.quantity,
+        p.productItems.map(item => new ProductItem(item.productItemId, item.name))
+      ));
+    }
     builder.setRequestDetails(details);
     if (data.notes !== undefined) {
       builder.setNotes(data.notes);
@@ -53,9 +84,20 @@ export class InboundRequestService {
   }
 
   async updateProduct(id: string, products: InboundRequest['products']): Promise<InboundRequest | null> {
-    const builder = new InboundRequestBuilder().setProduct(products);
-    const updateData = builder.build();
-    return await InboundRequestModel.findByIdAndUpdate(id, { products: updateData.products }, { new: true });
+    // Convert repository products to domain Product instances
+    const domainProducts = products.map(p => new Product(
+      p.productId,
+      p.productName,
+      p.productCode,
+      p.productAreaM2,
+      p.requiresExpiry,
+      p.requiresSerial,
+      p.handlingNotes,
+      p.quantity,
+      p.productItems.map(item => new ProductItem(item.productItemId, item.name))
+    ));
+    // Only update products, do not build full domain object (avoid companyId issue)
+    return await InboundRequestModel.findByIdAndUpdate(id, { products: domainProducts }, { new: true });
   }
 
   async changeStatus(id: string, status: InboundRequest['status']): Promise<InboundRequest | null> {

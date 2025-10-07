@@ -1,6 +1,9 @@
 import type { OutboundRequest } from '../repositories/outboundRequest.model.js';
 import { OutboundRequestModel } from '../repositories/outboundRequest.model.js';
-import { OutboundRequestBuilder } from '../factories/outboundRequest.builder.js';
+import { OutboundRequestBuilder } from '../domain/request/OutboundRequestBuilder.js';
+import { Company } from '../domain/request/Company.js';
+import { Product } from '../domain/request/Product.js';
+import { ProductItem } from '../domain/request/ProductItem.js';
 
 export class OutboundRequestService {
   async create(data: Partial<OutboundRequest>): Promise<OutboundRequest> {
@@ -14,13 +17,26 @@ export class OutboundRequestService {
       }
     }
     const orderNumber = `ORD${nextNumber.toString().padStart(3, '0')}`;
+    const domainCompany = data.company ? new Company(data.company.companyId, data.company.name) : undefined;
+    const domainProducts = (data.products ?? []).map(p => new Product(
+      p.productId,
+      p.productName,
+      p.productCode,
+      p.productAreaM2,
+      p.requiresExpiry,
+      p.requiresSerial,
+      p.handlingNotes,
+      p.quantity,
+      p.productItems.map(item => new ProductItem(item.productItemId, item.name))
+    ));
+    const requestDetails: any = {
+      requestDate: data.requestDate!,
+      releaseDate: data.releaseDate!
+    };
+    if (domainCompany) requestDetails.company = domainCompany;
     const builder = new OutboundRequestBuilder()
-      .setRequestDetails({
-        requestDate: data.requestDate!,
-        releaseDate: data.releaseDate!,
-        company: data.company!
-      })
-      .setProduct(data.products!)
+      .setRequestDetails(requestDetails)
+      .setProduct(domainProducts)
       .setStatus(data.status!)
       .setNotes(data.notes ?? '');
     (builder as any).request.orderNumber = orderNumber;
@@ -34,7 +50,22 @@ export class OutboundRequestService {
     const details: any = {};
     if (data.requestDate !== undefined) details.requestDate = data.requestDate;
     if (data.releaseDate !== undefined) details.releaseDate = data.releaseDate;
-    if (data.company !== undefined) details.company = data.company;
+    if (data.company !== undefined) {
+      details.company = new Company(data.company.companyId, data.company.name);
+    }
+    if (data.products !== undefined) {
+      details.products = data.products.map(p => new Product(
+        p.productId,
+        p.productName,
+        p.productCode,
+        p.productAreaM2,
+        p.requiresExpiry,
+        p.requiresSerial,
+        p.handlingNotes,
+        p.quantity,
+        p.productItems.map(item => new ProductItem(item.productItemId, item.name))
+      ));
+    }
     builder.setRequestDetails(details);
     if (data.notes !== undefined) {
       builder.setNotes(data.notes);
@@ -50,9 +81,19 @@ export class OutboundRequestService {
   }
 
   async updateProduct(id: string, products: OutboundRequest['products']): Promise<OutboundRequest | null> {
-    const builder = new OutboundRequestBuilder().setProduct(products);
-    const updateData = builder.build();
-    return await OutboundRequestModel.findByIdAndUpdate(id, { products: updateData.products }, { new: true });
+    const domainProducts = products.map(p => new Product(
+      p.productId,
+      p.productName,
+      p.productCode,
+      p.productAreaM2,
+      p.requiresExpiry,
+      p.requiresSerial,
+      p.handlingNotes,
+      p.quantity,
+      p.productItems.map(item => new ProductItem(item.productItemId, item.name))
+    ));
+    // Only update products, do not build full domain object (avoid companyId issue)
+    return await OutboundRequestModel.findByIdAndUpdate(id, { products: domainProducts }, { new: true });
   }
 
   async changeStatus(id: string, status: OutboundRequest['status']): Promise<OutboundRequest | null> {
