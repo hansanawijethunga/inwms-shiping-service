@@ -16,6 +16,15 @@ export class OutboundRequestController {
   static async updateRequestDetails(req: Request, res: Response): Promise<void> {
     try {
       const id = req.params.id ?? '';
+      // Defensive: If company is present, ensure it has companyId and name, but allow missing company
+      if (
+        req.body.company !== undefined &&
+        (req.body.company === null || typeof req.body.company !== 'object' ||
+          typeof req.body.company.companyId !== 'string' || typeof req.body.company.name !== 'string')
+      ) {
+        res.status(400).json({ error: 'Malformed company object: companyId and name required' });
+        return;
+      }
       const outboundRequest = await outboundRequestService.updateRequestDetails(id, req.body);
       if (!outboundRequest) {
         res.status(404).json({ error: 'OutboundRequest not found' });

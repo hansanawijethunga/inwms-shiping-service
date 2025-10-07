@@ -46,15 +46,14 @@ export class OutboundRequestService {
   async updateRequestDetails(id: string, data: Partial<OutboundRequest>): Promise<OutboundRequest | null> {
     const existing = await OutboundRequestModel.findById(id);
     if (!existing) return null;
-    const builder = new OutboundRequestBuilder();
-    const details: any = {};
-    if (data.requestDate !== undefined) details.requestDate = data.requestDate;
-    if (data.releaseDate !== undefined) details.releaseDate = data.releaseDate;
-    if (data.company !== undefined) {
-      details.company = new Company(data.company.companyId, data.company.name);
+    const updateFields: any = {};
+    if (data.requestDate !== undefined) updateFields.requestDate = data.requestDate;
+    if (data.releaseDate !== undefined) updateFields.releaseDate = data.releaseDate;
+    if (data.company && typeof data.company.companyId === 'string' && typeof data.company.name === 'string') {
+      updateFields.company = new Company(data.company.companyId, data.company.name);
     }
     if (data.products !== undefined) {
-      details.products = data.products.map(p => new Product(
+      updateFields.products = data.products.map(p => new Product(
         p.productId,
         p.productName,
         p.productCode,
@@ -66,16 +65,7 @@ export class OutboundRequestService {
         p.productItems.map(item => new ProductItem(item.productItemId, item.name))
       ));
     }
-    builder.setRequestDetails(details);
-    if (data.notes !== undefined) {
-      builder.setNotes(data.notes);
-    }
-    const updateData = builder.build();
-    const updateFields: any = {};
-    if (data.requestDate !== undefined) updateFields.requestDate = updateData.requestDate;
-    if (data.releaseDate !== undefined) updateFields.releaseDate = updateData.releaseDate;
-    if (data.company !== undefined) updateFields.company = updateData.company;
-    if (data.notes !== undefined) updateFields.notes = updateData.notes;
+    if (data.notes !== undefined) updateFields.notes = data.notes;
     updateFields.orderNumber = existing.orderNumber;
     return await OutboundRequestModel.findByIdAndUpdate(id, updateFields, { new: true });
   }
@@ -97,9 +87,8 @@ export class OutboundRequestService {
   }
 
   async changeStatus(id: string, status: OutboundRequest['status']): Promise<OutboundRequest | null> {
-    const builder = new OutboundRequestBuilder().setStatus(status);
-    const updateData = builder.build();
-    return await OutboundRequestModel.findByIdAndUpdate(id, { status: updateData.status }, { new: true });
+  // Only update status, do not build full domain object (avoid companyId issue)
+  return await OutboundRequestModel.findByIdAndUpdate(id, { status }, { new: true });
   }
 
   async getById(id: string): Promise<OutboundRequest | null> {

@@ -51,7 +51,7 @@ export class InboundRequestService {
     const details: any = {};
     if (data.arrivalDate !== undefined) details.arrivalDate = data.arrivalDate;
     if (data.externalTrackingNumber !== undefined) details.externalTrackingNumber = data.externalTrackingNumber;
-    if (data.company !== undefined) {
+    if (data.company && data.company.companyId && data.company.name) {
       details.company = new Company(data.company.companyId, data.company.name);
     }
     if (data.products !== undefined) {
@@ -101,9 +101,8 @@ export class InboundRequestService {
   }
 
   async changeStatus(id: string, status: InboundRequest['status']): Promise<InboundRequest | null> {
-    const builder = new InboundRequestBuilder().setStatus(status);
-    const updateData = builder.build();
-    return await InboundRequestModel.findByIdAndUpdate(id, { status: updateData.status }, { new: true });
+  // Only update status, do not build full domain object (avoid companyId issue)
+  return await InboundRequestModel.findByIdAndUpdate(id, { status }, { new: true });
   }
 
   async getById(id: string): Promise<InboundRequest | null> {
