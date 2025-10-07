@@ -1,0 +1,21 @@
+# Ignore build output
+/dist
+
+# Ignore dependencies
+/node_modules
+
+# Ignore environment files
+.env
+.env.example
+
+# Ignore git files
+.git
+.gitignore
+.gitmodules
+
+# Ignore logs
+*.log
+
+# Ignore OS/IDE files
+.DS_Store
+.vscode

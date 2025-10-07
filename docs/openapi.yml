@@ -1,0 +1,298 @@
+openapi: 3.0.3
+info:
+  title: Shipment Management Service API
+  version: 1.0.0
+  description: API documentation for the Shipment Management Service
+servers:
+  - url: http://localhost:4003
+paths:
+  /health:
+    get:
+      summary: Health check
+      responses:
+        '200':
+          description: Service is healthy
+  /resource/{type}:
+    get:
+      summary: Get all resources of a type
+      parameters:
+        - name: type
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of resources
+    post:
+      summary: Create a resource
+      parameters:
+        - name: type
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '201':
+          description: Resource created
+  /resource/{type}/{id}:
+    get:
+      summary: Get resource by ID
+      parameters:
+        - name: type
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Resource details
+    put:
+      summary: Update resource
+      parameters:
+        - name: type
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: Resource updated
+    delete:
+      summary: Delete resource
+      parameters:
+        - name: type
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Resource deleted
+  /inbound-request:
+    get:
+      summary: Get all inbound requests
+      responses:
+        '200':
+          description: List of inbound requests
+    post:
+      summary: Create inbound request
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '201':
+          description: Inbound request created
+  /inbound-request/{id}:
+    get:
+      summary: Get inbound request by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Inbound request details
+    patch:
+      summary: Update inbound request details
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: Inbound request updated
+  /outbound-request:
+    get:
+      summary: Get all outbound requests
+      responses:
+        '200':
+          description: List of outbound requests
+    post:
+      summary: Create outbound request
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '201':
+          description: Outbound request created
+  /outbound-request/{id}:
+    get:
+      summary: Get outbound request by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Outbound request details
+    patch:
+      summary: Update outbound request details
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: Outbound request updated
+  /loading-operation:
+    get:
+      summary: Get all loading operations
+      responses:
+        '200':
+          description: List of loading operations
+    post:
+      summary: Create loading operation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '201':
+          description: Loading operation created
+  /loading-operation/{id}:
+    get:
+      summary: Get loading operation by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Loading operation details
+    patch:
+      summary: Update loading operation
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: Loading operation updated
+  /unloading-operation:
+    get:
+      summary: Get all unloading operations
+      responses:
+        '200':
+          description: List of unloading operations
+    post:
+      summary: Create unloading operation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '201':
+          description: Unloading operation created
+  /unloading-operation/{id}:
+    get:
+      summary: Get unloading operation by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Unloading operation details
+    patch:
+      summary: Update unloading operation
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: Unloading operation updated
+    delete:
+      summary: Delete resource from unloading operation
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: resourceId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Resource deleted from unloading operation
