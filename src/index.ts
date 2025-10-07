@@ -3,6 +3,7 @@ import dotenv from 'dotenv';
 import healthRouter from './api/health.route.js';
 import resourceRouter from './api/resource.route.js';
 import inboundRequestRouter from './api/inboundRequest.route.js';
+import outboundRequestRouter from './api/outboundRequest.route.js';
 
 dotenv.config();
 
@@ -13,6 +14,7 @@ app.use(express.json());
 app.use('/api', healthRouter);
 app.use('/api/resources', resourceRouter);
 app.use('/api/inbound', inboundRequestRouter);
+app.use('/api/outbound', outboundRequestRouter);
 
 import { Database } from './config/database.js';
 
