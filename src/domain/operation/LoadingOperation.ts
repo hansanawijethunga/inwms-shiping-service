@@ -12,7 +12,7 @@ export interface LoadingOperationParams {
   resources?: Resource[];
   vehicles?: string[];
   status?: OperationStatus;
-  outboundRequest?: OutboundRequest; 
+  outboundRequest: OutboundRequest; 
   operatorId?: string;
   resourceId?: string;
   notes?: string;
@@ -20,7 +20,7 @@ export interface LoadingOperationParams {
 
 export class LoadingOperation extends Operation {
  
-  outboundRequest?: OutboundRequest; 
+   outboundRequest: OutboundRequest;
 
 
 

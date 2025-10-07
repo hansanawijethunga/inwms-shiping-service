@@ -1,12 +1,12 @@
-import { Schema, model, Document } from 'mongoose';
+
+import { Types, Schema, model, Document } from 'mongoose';
 
 export interface LoadingOperationDoc extends Document {
   operationId: string;
   date: Date;
   status: 'Initialized' | 'Started' | 'Completed';
-  details?: string;
-  operatorId?: string;
-  resourceId?: string;
+  resources: Array<{ _id: Types.ObjectId; type: 'forklift' | 'worker' }>;
+  outboundRequest: Types.ObjectId;
   notes?: string;
 }
 
@@ -14,9 +14,13 @@ const LoadingOperationSchema = new Schema<LoadingOperationDoc>({
   operationId: { type: String, required: true, unique: true },
   date: { type: Date, required: true },
   status: { type: String, enum: ['Initialized', 'Started', 'Completed'], default: 'Initialized' },
-  details: String,
-  operatorId: String,
-  resourceId: String,
+  resources: [
+    {
+      _id: { type: Schema.Types.ObjectId },
+      type: { type: String, enum: ['forklift', 'worker'] },
+    }
+  ],
+  outboundRequest: { type: Schema.Types.ObjectId, ref: 'OutboundRequest', required: true },
   notes: String,
 });
 

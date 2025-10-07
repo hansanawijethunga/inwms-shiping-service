@@ -12,14 +12,14 @@ export type OperationStatus = 'Initialized' | 'Started' | 'Completed';
   resources?: Resource[];
   vehicles?: string[];
   status?: OperationStatus;
-  inboundRequest?: InboundRequest;
+  inboundRequest: InboundRequest;
   operatorId?: string;
   notes?: string;
 }
 
 export class UnloadingOperation extends Operation {
 
-  inboundRequest?: InboundRequest | undefined;
+  inboundRequest?: InboundRequest
  
 
   constructor(params: UnloadingOperationParams) {
