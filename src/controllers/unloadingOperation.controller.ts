@@ -1,3 +1,25 @@
+/**
+ * DELETE /unloading-operations/:id/resources/:resourceId
+ * Remove a resource from the resources array by _id
+ */
+export async function deleteUnloadingOperationResource(req: Request, res: Response) {
+  try {
+    const id = String(req.params.id);
+    const resourceId = String(req.params.resourceId);
+    const doc = await service.getById(id);
+    if (!doc) return res.status(404).json({ error: 'Operation not found' });
+
+    const initialLength = doc.resources.length;
+    doc.resources = doc.resources.filter(r => r._id.toString() !== resourceId);
+    if (doc.resources.length === initialLength) {
+      return res.status(404).json({ error: 'Resource not found in operation' });
+    }
+    await doc.save();
+    res.json({ message: 'Resource deleted.', resources: doc.resources });
+  } catch (err) {
+    res.status(400).json({ error: (err as Error).message });
+  }
+}
 import { ForkliftModel } from '../repositories/forklift.model.js';
 import { WorkerModel } from '../repositories/worker.model.js';
 /**

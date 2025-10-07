@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { createLoadingOperation, getLoadingOperationById, getLoadingOperations,
     patchLoadingOperationStatus,patchLoadingOperationReset,patchLoadingOperationVehicles, 
-    patchLoadingOperationResources } from '../controllers/loadingOperation.controller.js';
+    patchLoadingOperationResources,deleteLoadingOperationResource } from '../controllers/loadingOperation.controller.js';
 
 const router = Router();
 router.post('/', createLoadingOperation);
@@ -11,5 +11,6 @@ router.patch('/:id/status', patchLoadingOperationStatus);
 router.patch('/:id/reset', patchLoadingOperationReset);
 router.patch('/:id/vehicles', patchLoadingOperationVehicles);
 router.patch('/:id/resources', patchLoadingOperationResources);
+router.delete('/:id/resources/:resourceId', deleteLoadingOperationResource);
 
 export default router;
