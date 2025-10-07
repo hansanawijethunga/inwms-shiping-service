@@ -122,7 +122,23 @@ export async function getUnloadingOperationById(req: Request, res: Response) {
     const id = String(req.params.id);
     const doc = await service.getById(id);
     if (!doc) return res.status(404).json({ error: 'Not found' });
-    res.json(doc);
+
+    // Populate resource details
+    const resources = await Promise.all(
+      doc.resources.map(async r => {
+        let details = {};
+        if (r.type === 'forklift') {
+          const forklift = await ForkliftModel.findById(r._id);
+          if (forklift) details = { ...forklift.toObject(), type: 'forklift' };
+        } else if (r.type === 'worker') {
+          const worker = await WorkerModel.findById(r._id);
+          if (worker) details = { ...worker.toObject(), type: 'worker' };
+        }
+        return { _id: r._id, type: r.type, ...details };
+      })
+    );
+    const result = { ...doc.toObject(), resources };
+    res.json(result);
   } catch (err) {
     res.status(400).json({ error: (err as Error).message });
   }
@@ -134,7 +150,25 @@ export async function getUnloadingOperationById(req: Request, res: Response) {
 export async function getUnloadingOperations(req: Request, res: Response) {
   try {
     const docs = await service.getAll(req.query);
-    res.json(docs);
+    const results = await Promise.all(
+      docs.map(async doc => {
+        const resources = await Promise.all(
+          doc.resources.map(async r => {
+            let details = {};
+            if (r.type === 'forklift') {
+              const forklift = await ForkliftModel.findById(r._id);
+              if (forklift) details = { ...forklift.toObject(), type: 'forklift' };
+            } else if (r.type === 'worker') {
+              const worker = await WorkerModel.findById(r._id);
+              if (worker) details = { ...worker.toObject(), type: 'worker' };
+            }
+            return { _id: r._id, type: r.type, ...details };
+          })
+        );
+        return { ...doc.toObject(), resources };
+      })
+    );
+    res.json(results);
   } catch (err) {
     res.status(400).json({ error: (err as Error).message });
   }
