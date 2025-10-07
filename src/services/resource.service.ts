@@ -59,19 +59,50 @@ export class ResourceService implements IResourceService {
   }
 
   async getById(type: ResourceType, id: string): Promise<any> {
+    let doc;
     if (type === 'forklift') {
-      return await ForkliftModel.findById(id);
+      doc = await ForkliftModel.findById(id);
+      if (!doc) return null;
+      const forklift = this.domainForkliftFactory.create({
+        code: doc.code,
+        model: doc.model
+      });
+      (forklift as any)._id = doc._id?.toString();
+      return forklift.toJson();
     } else if (type === 'worker') {
-      return await WorkerModel.findById(id);
+      doc = await WorkerModel.findById(id);
+      if (!doc) return null;
+      const worker = this.domainWorkerFactory.create({
+        name: doc.name,
+        code: doc.code
+      });
+      (worker as any)._id = doc._id?.toString();
+      return worker.toJson();
     }
     throw new Error('Unknown resource type');
   }
 
   async getAll(type: ResourceType, filter: any = {}): Promise<any[]> {
     if (type === 'forklift') {
-      return await ForkliftModel.find(filter || {});
+      const docs = await ForkliftModel.find(filter || {});
+      return docs.map(doc => {
+        const forklift = this.domainForkliftFactory.create({
+          code: doc.code,
+          model: doc.model
+        });
+        (forklift as any)._id = doc._id?.toString();
+        return forklift.toJson();
+      });
     } else if (type === 'worker') {
-      return await WorkerModel.find(filter || {});
+      const docs = await WorkerModel.find(filter || {});
+      return docs.map(doc => {
+        const worker = this.domainWorkerFactory.create({
+          name: doc.name,
+          code: doc.code
+        });
+        (worker as any)._id = doc._id?.toString();
+        return worker.toJson();
+      });
     }
     throw new Error('Unknown resource type');
   }

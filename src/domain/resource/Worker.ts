@@ -23,4 +23,11 @@ export class Worker implements Resource {
     return !!result;
   }
 
+  toJson(): Record<string, any> {
+    return {
+      _id: this._id,
+      name: this.name,
+      code: this.code
+    };
+  }
 }

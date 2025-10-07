@@ -23,4 +23,12 @@ export class Forklift implements Resource {
     const result = await ForkliftModel.findByIdAndDelete(this._id);
     return !!result;
   }
+
+  toJson(): Record<string, any> {
+    return {
+      _id: this._id,
+      code: this.code,
+      model: this.model
+    };
+  }
 }
