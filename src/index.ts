@@ -4,6 +4,8 @@ import healthRouter from './api/health.route.js';
 import resourceRouter from './api/resource.route.js';
 import inboundRequestRouter from './api/inboundRequest.route.js';
 import outboundRequestRouter from './api/outboundRequest.route.js';
+import unloadingOperationRouter from './api/unloadingOperation.route.js';
+import loadingOperationRouter from './api/loadingOperation.route.js';
 
 dotenv.config();
 
@@ -15,6 +17,8 @@ app.use('/api', healthRouter);
 app.use('/api/resources', resourceRouter);
 app.use('/api/inbound', inboundRequestRouter);
 app.use('/api/outbound', outboundRequestRouter);
+app.use('/api/unloading-operations', unloadingOperationRouter);
+app.use('/api/loading-operations', loadingOperationRouter);
 
 import { Database } from './config/database.js';
 
