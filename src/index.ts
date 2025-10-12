@@ -1,4 +1,5 @@
 import express from 'express';
+import cors from 'cors';
 import dotenv from 'dotenv';
 import healthRouter from './api/health.route.js';
 import resourceRouter from './api/resource.route.js';
@@ -13,6 +14,7 @@ const app = express();
 const port = process.env.PORT || 3000;
 
 app.use(express.json());
+app.use(cors());
 app.use('/api', healthRouter);
 app.use('/api/resources', resourceRouter);
 app.use('/api/inbound', inboundRequestRouter);
